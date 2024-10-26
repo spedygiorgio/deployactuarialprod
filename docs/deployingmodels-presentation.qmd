@@ -1,0 +1,78 @@
+---
+title: "Deploying models in production"
+author: 
+  - Giorgio Alfredo Spedicato, PhD FCAS CSPA C.Stat\inst{1}
+institute: 
+  - Leitha SRL, Unipol Group
+execute: 
+  echo: false
+  warning: false
+  cache: false
+format: 
+  beamer:
+    code-block-bg: "#f8f8f8"
+    code-block-border-left: "#245ABE"
+    highlight-style: github
+    includes:
+      in-header: |
+        \usepackage{hyperref}
+        \usepackage{draftwatermark}
+        \SetWatermarkText{DRAFT}
+        \SetWatermarkScale{1.5}
+  revealjs:
+    slide-number: true
+    transition: slide
+    theme: night
+    highlight-style: github
+    css: presentazione-css.css
+date: today
+editor: visual
+bibliography: deploying.bib
+csl: 4or.csl
+---
+
+# Disclaimer
+
+The views and opinions expressed in this presentation are those of the author and do not necessarily reflect the position of the organization of which he belongs.
+
+------------------------------------------------------------------------
+
+# Intro
+
+- Deploying a model in production is a complex task that requires a deep understanding of the model, the data and the infrastructure.
+- Actuaries were traditionally involved in the first two aspects, but the third one is becoming more and more important.
+- Modern Python frameworks make the third aspect easier.
+
+------------------------------------------------------------------------
+
+## MLOps: Enhancing the ML Model Lifecycle
+
+- **Definition**: MLOps integrates practices to automate and manage the entire machine learning model lifecycle, improving deployment efficiency and reliability in production.
+
+- **Why It's Needed**: Bridges the gap between development and production, enabling better collaboration between data scientists and engineers for models that are more performant, scalable, and maintainable.
+
+- **Key Benefits**: Unified workflow reduces errors, accelerates deployment, and provides continuous monitoring to keep models up-to-date and accurate.
+
+
+------------------------------------------------------------------------
+
+
+# Streamlit walkthrough
+
+When you click the **Render** button a document will be generated that includes:
+
+-   Content authored with markdown
+-   Output from executable code
+
+------------------------------------------------------------------------
+
+
+## FastApi walkthrough
+
+When you click the **Render** button a document will be generated that includes:
+
+When you click the **Render** button a presentation will be generated that includes both content and the output of embedded code. You can embed code like this:
+
+------------------------------------------------------------------------
+
+# References {.allowframebreaks}

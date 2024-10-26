@@ -397,4 +397,6 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 
-venv/
+deployer/
+.Rproj.user
+catboost_info/
