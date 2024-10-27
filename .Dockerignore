@@ -1,0 +1,6 @@
+catboost_info/
+data/
+deployer/
+docs/
+mlruns/
+notebooks/
