@@ -401,3 +401,4 @@ deployer/
 .Rproj.user
 catboost_info/
 /models
+mlruns/

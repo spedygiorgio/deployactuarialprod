@@ -1,0 +1,13 @@
+data:
+  train_path: 'data/train.csv'
+  test_path: 'data/test.csv'
+  valid_path: 'data/valid.csv'
+
+models:
+  frequency: 'models/frequency_model.cbm'
+  severity: 'models/severity_model.cbm'
+
+mlflow:
+  experiment_name: 'InsuranceApp'
+  run_name: 'frequency_severity'
+  tracking_uri: 'http://localhost:5000'
