@@ -8,6 +8,7 @@ execute:
   echo: false
   warning: false
   cache: false
+  enable: false
 format: 
   beamer:
     code-block-bg: "#f8f8f8"
@@ -41,7 +42,7 @@ The views and opinions expressed in this presentation are those of the author an
 
 -   Deploying a model in production is a complex task that requires a deep understanding of the model, the data and the infrastructure.
 -   Actuaries were traditionally involved in the first two aspects, but the third one is becoming more and more important.
--   Modern Python frameworks make the third aspect easier.
+-   Modern *Python frameworks* make the third aspect *easier*, at least when presenting a POC to the stakeholders.
 
 ------------------------------------------------------------------------
 
@@ -57,7 +58,7 @@ The views and opinions expressed in this presentation are those of the author an
 
 ## MLOps: instruments
 
--   **Model training**: Python pipelines with specified requirements.
+-   **Model training**: Python pipelines, requirements files, MLflow
 -   **Version control**: Git, GitHub, GitLab
 -   **Model deployment**: FastAPI, Streamlit, Docker
 
@@ -85,6 +86,14 @@ The views and opinions expressed in this presentation are those of the author an
 
 ------------------------------------------------------------------------
 
+## Running the pipeline
+
+-   see the `main.py` file
+-   the directory `steps` contains the steps of the pipeline
+-   It can be run as `python main.py`
+
+------------------------------------------------------------------------
+
 ## Requirements
 
 -   Python packages specified in a `requirements.txt` file
@@ -95,8 +104,8 @@ The views and opinions expressed in this presentation are those of the author an
 
 ## MLflow
 
--   MLflow is an open source platform for managing the end-to-end machine learning lifecycle.
--   It is used to log the results and artifacts of the models
+-   MLflow [@alla2020] is an open source platform for managing the end-to-end machine learning lifecycle.
+-   It is used to log the results and artifacts of the models, that can be inspected in the MLFlow UI at `http://localhost:5000` after running the pipeline
 -   It is organized in experiments and runs
 
 ------------------------------------------------------------------------
@@ -105,7 +114,7 @@ The views and opinions expressed in this presentation are those of the author an
 
 ## Why streamlit?
 
--   Streamlit is an open-source app framework for Machine Learning and Data Science projects.
+-   Streamlit [@raghavendra2022] is an open-source app framework for Machine Learning and Data Science projects.
 -   It creates a user interface for the models
 -   It is easy to use and to deploy
 
@@ -113,27 +122,76 @@ The views and opinions expressed in this presentation are those of the author an
 
 ## Streamlit code
 
--   the st. functions are used to create the user interface
--   the session state is used to track user's choices
+-   the `st.` functions are used to create the user interface
+-   the session state is used to track user's choices, e.g. button clicks
 -   the models are loaded, cached and used to make predictions
 
 ------------------------------------------------------------------------
 
-## FastApi walkthrough
+## Running the app
 
-### Why FastAPI?
-
--   FastAPI is a modern framework for building APIs, e.g. for deploying machine learning models.
--   It allows to expose the models as a REST API, so that they can be used by other applications e.g. by rest
--   It uses Python type hints to validate the input and output of the API
+-   The app is run with `streamlit run quote-page.py`
+-   An initial section allows to input che policyholder's data (pre-defined values exists)
+-   A button click will send the data to the predict pipeline and show the results
 
 ------------------------------------------------------------------------
 
-### Structure of a FastAPI app
+# FastAPI Walkthrough
 
--   The app is defined in a Python file
--   The models are loaded and used to make predictions
--   The app is run with `uvicorn`
+## Why FastAPI?
+
+-   FastAPI [@lathkar2023] is a modern framework for building APIs, ideal for deploying machine learning models.
+-   It enables exposing models as a REST API, allowing other applications to use them, for example, via Python’s `requests` library.
+-   It uses Python type hints to validate the input and output of the API, improving code readability and maintainability.
+
+------------------------------------------------------------------------
+
+## Structure of a FastAPI App
+
+-   The application is defined in a Python file, typically named `app.py`.
+-   The app runs with the ASGI server `uvicorn`, allowing FastAPI to handle asynchronous requests, which increases scalability and speed.
+-   The app structure includes a startup event for loading models, endpoints for handling requests, and dependencies to manage model usage.
+
+------------------------------------------------------------------------
+
+## Key Components of the Insurance Prediction API
+
+### 1. Input Schema
+
+-   The input is structured using the `Insured` model, a class that describes the characteristics of the insured person, such as vehicle power (`VehPower`), vehicle age (`VehAge`), driver age (`DrivAge`), and other attributes relevant for calculating insurance premiums.
+-   Each field includes a title, description, and validity limits using `Field` from `pydantic`. This ensures input data consistency and completeness.
+
+------------------------------------------------------------------------
+
+### 2. Output Schema
+
+-   The output is managed by the `PredictionResponse` class, defining the key variables predicted by the model: frequency (`Frequency`), severity (`Severity`), and pure premium (`Pure_Premium`).
+-   The `PredictionResponse` class ensures that the API always returns a standard format, simplifying integration with other applications.
+
+------------------------------------------------------------------------
+
+### 3. Startup Event
+
+-   A FastAPI startup event, defined with `@app.on_event("startup")`, loads the `CatBoost` models from the `models` folder. This prevents reloading the models every time a request is made, improving efficiency.
+-   In this example, `model_freq` and `model_sev` are, respectively, the frequency and severity prediction models.
+
+------------------------------------------------------------------------
+
+### 4. Prediction Endpoint
+
+-   The primary endpoint of the application is `/predict/`, which receives the insured person’s data and returns a prediction.
+-   Within the endpoint, the `Frequency` model and `Severity` model are used to calculate the pure premium:
+    -   **Frequency** (`Frequency`): predicts the number of claims.
+    -   **Severity** (`Severity`): predicts the average cost of claims.
+    -   **Pure Premium** (`Pure_Premium`): calculated as `Frequency * Severity`, representing the expected premium for the customer.
+-   The endpoint uses FastAPI’s `Depends` to load the model dependencies and then uses `Predictor` to perform predictions.
+
+------------------------------------------------------------------------
+
+### FastAPI in Action
+
+-   The API can be run locally using the command `uvicorn app:app --reload`, enabling rapid development and testing.
+-   Once the application is online, you can interact with the prediction endpoint using tools like `curl` or directly from FastAPI’s interactive documentation available at `/docs`.
 
 ------------------------------------------------------------------------
 
@@ -141,20 +199,19 @@ The views and opinions expressed in this presentation are those of the author an
 
 ## Why Docker?
 
--   Docker is a platform for developing, shipping, and running applications.
--   It allows to create containers with the models and the dependencies
--   It is used to deploy the models in production
+-   Docker [@jangla2018b] is a platform for developing, shipping, and running applications.
+-   It allows you to create containers with models and dependencies, ensuring a consistent and isolated environment.
+-   Commonly used to deploy machine learning models in production.
 
 ------------------------------------------------------------------------
 
-### Dockerfile
+## Dockerfile Overview
 
--   The Dockerfile is used to create the container
--   Classical steps are:
-    -   load a base python image
-    -   copy models and code
-    -   install requirements
-    -   Run the app
+-   The Dockerfile defines steps to create a container for our FastAPI application, including:
+    -   Loading a base Python image
+    -   Copying models, code, and dependencies
+    -   Installing packages from `requirements.txt`
+    -   Starting the FastAPI app
 
 ------------------------------------------------------------------------
 

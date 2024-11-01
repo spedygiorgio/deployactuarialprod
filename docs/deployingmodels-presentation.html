@@ -30,7 +30,26 @@
       margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
       vertical-align: middle;
     }
-  </style>
+    /* CSS for citations */
+    div.csl-bib-body { }
+    div.csl-entry {
+      clear: both;
+    }
+    .hanging-indent div.csl-entry {
+      margin-left:2em;
+      text-indent:-2em;
+    }
+    div.csl-left-margin {
+      min-width:2em;
+      float:left;
+    }
+    div.csl-right-inline {
+      margin-left:2em;
+      padding-left:1em;
+    }
+    div.csl-indent {
+      margin-left: 2em;
+    }  </style>
   <link rel="stylesheet" href="deployingmodels-presentation_files/libs/revealjs/dist/theme/quarto.css">
   <link rel="stylesheet" href="presentazione-css.css">
   <link href="deployingmodels-presentation_files/libs/revealjs/plugin/quarto-line-highlight/line-highlight.css" rel="stylesheet">
@@ -356,7 +375,7 @@ Giorgio Alfredo Spedicato, PhD FCAS CSPA C.Stat
 <ul>
 <li>Deploying a model in production is a complex task that requires a deep understanding of the model, the data and the infrastructure.</li>
 <li>Actuaries were traditionally involved in the first two aspects, but the third one is becoming more and more important.</li>
-<li>Modern Python frameworks make the third aspect easier.</li>
+<li>Modern <em>Python frameworks</em> make the third aspect <em>easier</em>, at least when presenting a POC to the stakeholders.</li>
 </ul>
 </section>
 <section id="mlops-enhancing-the-ml-model-lifecycle" class="slide level2">
@@ -370,7 +389,7 @@ Giorgio Alfredo Spedicato, PhD FCAS CSPA C.Stat
 <section id="mlops-instruments" class="slide level2">
 <h2>MLOps: instruments</h2>
 <ul>
-<li><strong>Model training</strong>: Python pipelines with specified requirements.</li>
+<li><strong>Model training</strong>: Python pipelines, requirements files, MLflow</li>
 <li><strong>Version control</strong>: Git, GitHub, GitLab</li>
 <li><strong>Model deployment</strong>: FastAPI, Streamlit, Docker</li>
 </ul>
@@ -405,6 +424,14 @@ Giorgio Alfredo Spedicato, PhD FCAS CSPA C.Stat
 <li>Assess the performance of the models, uses MLflow to log the results and artifacts</li>
 </ul>
 </section>
+<section id="running-the-pipeline" class="slide level2">
+<h2>Running the pipeline</h2>
+<ul>
+<li>see the <code>main.py</code> file</li>
+<li>the directory <code>steps</code> contains the steps of the pipeline</li>
+<li>It can be run as <code>python main.py</code></li>
+</ul>
+</section>
 <section id="requirements" class="slide level2">
 <h2>Requirements</h2>
 <ul>
@@ -416,8 +443,8 @@ Giorgio Alfredo Spedicato, PhD FCAS CSPA C.Stat
 <section id="mlflow" class="slide level2">
 <h2>MLflow</h2>
 <ul>
-<li>MLflow is an open source platform for managing the end-to-end machine learning lifecycle.</li>
-<li>It is used to log the results and artifacts of the models</li>
+<li>MLflow <span class="citation" data-cites="alla2020">(<a href="#/references" role="doc-biblioref" onclick="">Alla and Adari 2020</a>)</span> is an open source platform for managing the end-to-end machine learning lifecycle.</li>
+<li>It is used to log the results and artifacts of the models, that can be inspected in the MLFlow UI at <code>http://localhost:5000</code> after running the pipeline</li>
 <li>It is organized in experiments and runs</li>
 </ul>
 </section>
@@ -432,7 +459,7 @@ Giorgio Alfredo Spedicato, PhD FCAS CSPA C.Stat
 <section id="why-streamlit" class="slide level2">
 <h2>Why streamlit?</h2>
 <ul>
-<li>Streamlit is an open-source app framework for Machine Learning and Data Science projects.</li>
+<li>Streamlit <span class="citation" data-cites="raghavendra2022">(<a href="#/references" role="doc-biblioref" onclick="">Raghavendra 2022</a>)</span> is an open-source app framework for Machine Learning and Data Science projects.</li>
 <li>It creates a user interface for the models</li>
 <li>It is easy to use and to deploy</li>
 </ul>
@@ -440,27 +467,87 @@ Giorgio Alfredo Spedicato, PhD FCAS CSPA C.Stat
 <section id="streamlit-code" class="slide level2">
 <h2>Streamlit code</h2>
 <ul>
-<li>the st. functions are used to create the user interface</li>
-<li>the session state is used to track user’s choices</li>
+<li>the <code>st.</code> functions are used to create the user interface</li>
+<li>the session state is used to track user’s choices, e.g.&nbsp;button clicks</li>
 <li>the models are loaded, cached and used to make predictions</li>
 </ul>
 </section>
-<section id="fastapi-walkthrough" class="slide level2">
-<h2>FastApi walkthrough</h2>
-<h3 id="why-fastapi">Why FastAPI?</h3>
+<section id="running-the-app" class="slide level2">
+<h2>Running the app</h2>
 <ul>
-<li>FastAPI is a modern framework for building APIs, e.g.&nbsp;for deploying machine learning models.</li>
-<li>It allows to expose the models as a REST API, so that they can be used by other applications e.g.&nbsp;by rest</li>
-<li>It uses Python type hints to validate the input and output of the API</li>
+<li>The app is run with <code>streamlit run quote-page.py</code></li>
+<li>An initial section allows to input che policyholder’s data (pre-defined values exists)</li>
+<li>A button click will send the data to the predict pipeline and show the results</li>
 </ul>
 </section>
 <section class="slide level2">
 
-<h3 id="structure-of-a-fastapi-app">Structure of a FastAPI app</h3>
+</section></section>
+<section>
+<section id="fastapi-walkthrough" class="title-slide slide level1 center">
+<h1>FastAPI Walkthrough</h1>
+
+</section>
+<section id="why-fastapi" class="slide level2">
+<h2>Why FastAPI?</h2>
 <ul>
-<li>The app is defined in a Python file</li>
-<li>The models are loaded and used to make predictions</li>
-<li>The app is run with <code>uvicorn</code></li>
+<li>FastAPI <span class="citation" data-cites="lathkar2023">(<a href="#/references" role="doc-biblioref" onclick="">Lathkar 2023</a>)</span> is a modern framework for building APIs, ideal for deploying machine learning models.</li>
+<li>It enables exposing models as a REST API, allowing other applications to use them, for example, via Python’s <code>requests</code> library.</li>
+<li>It uses Python type hints to validate the input and output of the API, improving code readability and maintainability.</li>
+</ul>
+</section>
+<section id="structure-of-a-fastapi-app" class="slide level2">
+<h2>Structure of a FastAPI App</h2>
+<ul>
+<li>The application is defined in a Python file, typically named <code>app.py</code>.</li>
+<li>The app runs with the ASGI server <code>uvicorn</code>, allowing FastAPI to handle asynchronous requests, which increases scalability and speed.</li>
+<li>The app structure includes a startup event for loading models, endpoints for handling requests, and dependencies to manage model usage.</li>
+</ul>
+</section>
+<section id="key-components-of-the-insurance-prediction-api" class="slide level2">
+<h2>Key Components of the Insurance Prediction API</h2>
+<h3 id="input-schema">1. Input Schema</h3>
+<ul>
+<li>The input is structured using the <code>Insured</code> model, a class that describes the characteristics of the insured person, such as vehicle power (<code>VehPower</code>), vehicle age (<code>VehAge</code>), driver age (<code>DrivAge</code>), and other attributes relevant for calculating insurance premiums.</li>
+<li>Each field includes a title, description, and validity limits using <code>Field</code> from <code>pydantic</code>. This ensures input data consistency and completeness.</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="output-schema">2. Output Schema</h3>
+<ul>
+<li>The output is managed by the <code>PredictionResponse</code> class, defining the key variables predicted by the model: frequency (<code>Frequency</code>), severity (<code>Severity</code>), and pure premium (<code>Pure_Premium</code>).</li>
+<li>The <code>PredictionResponse</code> class ensures that the API always returns a standard format, simplifying integration with other applications.</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="startup-event">3. Startup Event</h3>
+<ul>
+<li>A FastAPI startup event, defined with <code>@app.on_event("startup")</code>, loads the <code>CatBoost</code> models from the <code>models</code> folder. This prevents reloading the models every time a request is made, improving efficiency.</li>
+<li>In this example, <code>model_freq</code> and <code>model_sev</code> are, respectively, the frequency and severity prediction models.</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="prediction-endpoint">4. Prediction Endpoint</h3>
+<ul>
+<li>The primary endpoint of the application is <code>/predict/</code>, which receives the insured person’s data and returns a prediction.</li>
+<li>Within the endpoint, the <code>Frequency</code> model and <code>Severity</code> model are used to calculate the pure premium:
+<ul>
+<li><strong>Frequency</strong> (<code>Frequency</code>): predicts the number of claims.</li>
+<li><strong>Severity</strong> (<code>Severity</code>): predicts the average cost of claims.</li>
+<li><strong>Pure Premium</strong> (<code>Pure_Premium</code>): calculated as <code>Frequency * Severity</code>, representing the expected premium for the customer.</li>
+</ul></li>
+<li>The endpoint uses FastAPI’s <code>Depends</code> to load the model dependencies and then uses <code>Predictor</code> to perform predictions.</li>
+</ul>
+</section>
+<section class="slide level2">
+
+<h3 id="fastapi-in-action">FastAPI in Action</h3>
+<ul>
+<li>The API can be run locally using the command <code>uvicorn app:app --reload</code>, enabling rapid development and testing.</li>
+<li>Once the application is online, you can interact with the prediction endpoint using tools like <code>curl</code> or directly from FastAPI’s interactive documentation available at <code>/docs</code>.</li>
 </ul>
 </section>
 <section class="slide level2">
@@ -474,22 +561,20 @@ Giorgio Alfredo Spedicato, PhD FCAS CSPA C.Stat
 <section id="why-docker" class="slide level2">
 <h2>Why Docker?</h2>
 <ul>
-<li>Docker is a platform for developing, shipping, and running applications.</li>
-<li>It allows to create containers with the models and the dependencies</li>
-<li>It is used to deploy the models in production</li>
+<li>Docker <span class="citation" data-cites="jangla2018b">(<a href="#/references" role="doc-biblioref" onclick="">Jangla 2018</a>)</span> is a platform for developing, shipping, and running applications.</li>
+<li>It allows you to create containers with models and dependencies, ensuring a consistent and isolated environment.</li>
+<li>Commonly used to deploy machine learning models in production.</li>
 </ul>
 </section>
-<section class="slide level2">
-
-<h3 id="dockerfile">Dockerfile</h3>
+<section id="dockerfile-overview" class="slide level2">
+<h2>Dockerfile Overview</h2>
 <ul>
-<li>The Dockerfile is used to create the container</li>
-<li>Classical steps are:
+<li>The Dockerfile defines steps to create a container for our FastAPI application, including:
 <ul>
-<li>load a base python image</li>
-<li>copy models and code</li>
-<li>install requirements</li>
-<li>Run the app</li>
+<li>Loading a base Python image</li>
+<li>Copying models, code, and dependencies</li>
+<li>Installing packages from <code>requirements.txt</code></li>
+<li>Starting the FastAPI app</li>
 </ul></li>
 </ul>
 </section>
@@ -505,10 +590,24 @@ Giorgio Alfredo Spedicato, PhD FCAS CSPA C.Stat
 <section class="slide level2">
 
 </section></section>
-<section id="references" class="title-slide slide level1 allowframebreaks center">
+<section id="references" class="title-slide slide level1 allowframebreaks smaller scrollable">
 <h1>References</h1>
 <div class="footer footer-default">
 
+</div>
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-alla2020" class="csl-entry" role="listitem">
+Alla S, Adari SK (2020) <a href="https://doi.org/10.1007/978-1-4842-6549-9_4">Introduction to MLFlow</a>. Apress, pp 125–227
+</div>
+<div id="ref-jangla2018b" class="csl-entry" role="listitem">
+Jangla K (2018) <a href="https://doi.org/10.1007/978-1-4842-3936-0_2">Docker</a>. Apress, pp 9–17
+</div>
+<div id="ref-lathkar2023" class="csl-entry" role="listitem">
+Lathkar M (2023) <a href="https://doi.org/10.1007/978-1-4842-9178-8_1">Introduction to FastAPI</a>. Apress, pp 1–28
+</div>
+<div id="ref-raghavendra2022" class="csl-entry" role="listitem">
+Raghavendra S (2022) <a href="https://doi.org/10.1007/978-1-4842-8983-9_1">Introduction to Streamlit</a>. Apress, pp 1–15
+</div>
 </div>
 </section>
     </div>
