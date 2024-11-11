@@ -18,6 +18,7 @@ sev_model_path = os.path.join('models', 'severity_model.cbm')
 
 #%% main core
 def main():
+    # load the config file
     with open('config.yml', 'r') as file:
         config = yaml.safe_load(file)
     mlflow.set_experiment(config['mlflow']['experiment_name'])
@@ -55,7 +56,7 @@ def main():
         freq_apratio, freq_mpd = trainer_frequency.evaluate_model(frequency_model, test_freq_pool)
         mlflow.log_metric('freq_apratio', freq_apratio)
         mlflow.log_metric('freq_mpd', freq_mpd)
-        logging.info(f'Frequency model trained: AP ratio={freq_apratio}, MPD={freq_mpd}')
+        logging.info(f'Frequency model trained: A/P ratio={freq_apratio:.2f}, MPD={freq_mpd:.2f}')
         frequency_model.save_model(freq_model_path)
         
         ## severity
@@ -65,7 +66,7 @@ def main():
         sev_apratio, sev_rmse = trainer_severity.evaluate_model(severity_model, test_sev_pool)
         mlflow.log_metric('sev_apratio', sev_apratio)
         mlflow.log_metric('sev_rmse', sev_rmse)
-        logging.info(f'Severity model trained: AP ratio={sev_apratio}, RMSE={sev_rmse}')
+        logging.info(f'Severity model trained: A/P ratio={sev_apratio}, RMSE={sev_rmse}')
         severity_model.save_model(sev_model_path)
 
         # tagging models on MLflow
