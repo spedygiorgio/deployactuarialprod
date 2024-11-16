@@ -100,7 +100,7 @@ def main():
     st.button('Calculate premium', on_click=on_click_callback)
 
     # calculate the pure premium
-    if st.session_state.button_clicked:
+    if st.session_state.button_clicked is True:
         with st.spinner('Calculating the premium...'):
             frequency, severity, pure_premium = calculate_premium(policyholder, model_freq, model_sev)
             st.write(f'Frequency: {frequency:.3%}')
