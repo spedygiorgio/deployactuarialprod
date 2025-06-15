@@ -5,6 +5,7 @@ from typing import Literal
 from catboost import CatBoostRegressor
 import pandas as pd
 from steps.predict import Predictor
+import uvicorn
 
 app = FastAPI()
 
@@ -64,3 +65,12 @@ async def predict(
     
     # Create response
     return PredictionResponse(Frequency=pred_freq, Severity=pred_sev, Pure_Premium=pure_premium)
+
+#%% core to run the FastAPI app 
+if __name__ == "__main__":
+    uvicorn.run(
+            "app:app",
+            host="0.0.0.0",
+            port=8000,
+            reload=True
+        )

@@ -217,9 +217,9 @@ The views and opinions expressed in this presentation are those of the author an
 
 ### Docker commands
 
--   `docker build -t myimage .` to build the image
--   `docker run -d --name mycontainer -p 8000:8000 myimage` to run the container that exposes the app on port 8000
--   `docker stop mycontainer` to stop the container
+-   `docker build -t deployer .` to build the image
+-   `docker run -d --name deployer -p 8080:8080 deployer:latest` to run the container that exposes the app on port 8000
+-   ``` docker stop``deployer ```to stop the container
 
 ------------------------------------------------------------------------
 
