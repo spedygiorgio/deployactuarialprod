@@ -62,7 +62,7 @@ docker build -t deployer .
 To run the Docker container, use the following command:
 
 ```bash
-docker run -d --name deployer -p 8080:8080 deployer:latest
+docker run -d --rm --name deployer -p 8080:8080 deployer:latest
 ```
 
 To stop the Docker container, use the following command:
