@@ -402,3 +402,4 @@ deployer/
 catboost_info/
 /models
 mlruns/
+desktop.ini
