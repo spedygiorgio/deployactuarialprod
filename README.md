@@ -22,6 +22,7 @@
 ### Fitting the models
 
 From another terminal, run the following commands:
+
 ```bash
 mlflow ui
 ```
