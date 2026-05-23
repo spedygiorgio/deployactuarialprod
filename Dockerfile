@@ -1,4 +1,4 @@
-FROM python:3.11-slim
+FROM python:3.13-slim
 
 # Set the working directory
 WORKDIR /app
@@ -8,9 +8,14 @@ COPY app.py .
 COPY models/ ./models/
 COPY steps/ ./steps/
 
-# Install dependencies
+# Install dependencies (install build tools temporarily in case some packages need compilation)
 COPY requirements.txt .
-RUN pip install --no-cache-dir -r requirements.txt
+RUN apt-get update \
+	&& apt-get install -y --no-install-recommends build-essential gcc g++ libc6-dev \
+	&& pip install --no-cache-dir -r requirements.txt \
+	&& apt-get remove -y build-essential gcc g++ \
+	&& apt-get autoremove -y \
+	&& rm -rf /var/lib/apt/lists/*
 
 # specify default commands
 CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8080"]

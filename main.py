@@ -1,5 +1,4 @@
 #%% libraries
-import logging
 import yaml
 import mlflow
 import mlflow.catboost
@@ -9,7 +8,9 @@ from steps.train import Trainer
 from steps.predict import Predictor
 from catboost import CatBoostRegressor
 import os
-logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(message)s')
+from utils import get_logger, timer
+
+logger = get_logger(__name__)
 
 #%% paths
 os.makedirs('models', exist_ok=True)
@@ -17,6 +18,7 @@ freq_model_path = os.path.join('models', 'frequency_model.cbm')
 sev_model_path = os.path.join('models', 'severity_model.cbm')
 
 #%% main core
+@timer
 def main():
     # load the config file
     with open('config.yml', 'r') as file:
@@ -31,22 +33,22 @@ def main():
         ingestor = Ingestion()
         ## frequency
         freq_train, freq_valid, freq_test = ingestor.load_freq()
-        logging.info(f'Frequency datasets loaded: train={freq_train.shape}, valid={freq_valid.shape}, test={freq_test.shape}')
+        logger.info(f'Frequency datasets loaded: train={freq_train.shape}, valid={freq_valid.shape}, test={freq_test.shape}')
         ## severity datasets
         severity_train, severity_valid, severity_test = ingestor.load_severity()
-        logging.info(f'Severity datasets loaded: train={severity_train.shape}, valid={severity_valid.shape}, test={severity_test.shape}')
+        logger.info(f'Severity datasets loaded: train={severity_train.shape}, valid={severity_valid.shape}, test={severity_test.shape}')
         # clean the datasets
         cleaner = Cleaner()
         ## frequency
         freq_train = cleaner.clean(freq_train, 'frequency')
         freq_valid = cleaner.clean(freq_valid, 'frequency')
         freq_test = cleaner.clean(freq_test, 'frequency')
-        logging.info(f'Frequency datasets cleaned: train={freq_train.shape}, valid={freq_valid.shape}, test={freq_test.shape}')
+        logger.info(f'Frequency datasets cleaned: train={freq_train.shape}, valid={freq_valid.shape}, test={freq_test.shape}')
         ## severity
         severity_train = cleaner.clean(severity_train, 'severity')
         severity_valid = cleaner.clean(severity_valid, 'severity')
         severity_test = cleaner.clean(severity_test, 'severity')
-        logging.info(f'Severity datasets cleaned: train={severity_train.shape}, valid={severity_valid.shape}, test={severity_test.shape}')
+        logger.info(f'Severity datasets cleaned: train={severity_train.shape}, valid={severity_valid.shape}, test={severity_test.shape}')
         
         # train the models
         ## frequency
@@ -56,7 +58,7 @@ def main():
         freq_apratio, freq_mpd = trainer_frequency.evaluate_model(frequency_model, test_freq_pool)
         mlflow.log_metric('freq_apratio', freq_apratio)
         mlflow.log_metric('freq_mpd', freq_mpd)
-        logging.info(f'Frequency model trained: A/P ratio={freq_apratio:.2f}, MPD={freq_mpd:.2f}')
+        logger.info(f'Frequency model trained: A/P ratio={freq_apratio:.2f}, MPD={freq_mpd:.2f}')
         frequency_model.save_model(freq_model_path)
         
         ## severity
@@ -66,7 +68,7 @@ def main():
         sev_apratio, sev_rmse = trainer_severity.evaluate_model(severity_model, test_sev_pool)
         mlflow.log_metric('sev_apratio', sev_apratio)
         mlflow.log_metric('sev_rmse', sev_rmse)
-        logging.info(f'Severity model trained: A/P ratio={sev_apratio}, RMSE={sev_rmse}')
+        logger.info(f'Severity model trained: A/P ratio={sev_apratio}, RMSE={sev_rmse}')
         severity_model.save_model(sev_model_path)
 
         # tagging models on MLflow

@@ -11,9 +11,20 @@
 
 ## Set up the python environment
 
+### approccio tradizionale
+
 - Create a virtual environment, e.g. using venv: `python -m venv deployer`
+
 - Activate the virtual environment: `source deployer/bin/activate`
 - Install the required packages: `pip install -r requirements.txt`
+
+### oppure con `uv`:
+
+```bash
+uv venv deployer
+deployer\Scripts\activate.bat
+uv pip install -r requirements.txt
+```
 
 ## How to run
 

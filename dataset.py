@@ -3,9 +3,14 @@ import pandas as pd
 import numpy as np
 import os
 from sklearn.model_selection import train_test_split
+from utils import get_logger, timer
+
+logger = get_logger(__name__)
+
 #%% Loading the dataset
 data_folder = 'data/'
 data_file = os.path.join(data_folder, 'french_mtpl.zip')
+@timer
 def main():
     dtypes_list = {'ClaimNb':np.int32, 
     'Exposure':np.float32, 'claims_cost ':np.float32, 'Density':np.int16, 
@@ -13,6 +18,7 @@ def main():
     'VehPower':np.int16, 'VehAge':np.int16, 'DrivAge':np.int16}
 
 
+    logger.info("Caricamento del dataset...")
     df = pd.read_csv(data_file, compression='zip',  sep=";", dtype=dtypes_list)#.assign(
         # severity=lambda x: x.apply(lambda row: row['claims_cost'] / row['ClaimNb'] if row['ClaimNb'] > 0 else 0, axis=1)
         #,log_exposure = lambda x: np.log(x['Exposure'])
@@ -37,7 +43,7 @@ def main():
     train_df.to_csv(os.path.join(data_folder, 'train.csv'), index=False, sep=";")
     valid_df.to_csv(os.path.join(data_folder, 'valid.csv'), index=False, sep=";")
     test_df.to_csv(os.path.join(data_folder, 'test.csv'), index=False, sep=";")
-    print('Dataset saved')
+    logger.info('Dataset salvato in data/train.csv, data/valid.csv e data/test.csv')
     return None
 # %%
 if __name__ == '__main__':
