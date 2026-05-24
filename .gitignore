@@ -409,3 +409,5 @@ desktop.ini
 .positai
 README_files/
 mlflow.db
+.Rhistory
+.RData

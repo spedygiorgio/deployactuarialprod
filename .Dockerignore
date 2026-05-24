@@ -1,6 +1,47 @@
+# Development and version control
+.git/
+.gitignore
+.vscode/
+.env
+.env.local
+
+# Python cache and artifacts
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# IDE and editor files
+*.code-workspace
+*.swp
+*.swo
+*~
+
+# System files
+.DS_Store
+desktop.ini
+
+# Machine learning and data (large files)
 catboost_info/
 data/
-deployer/
-docs/
 mlruns/
+deployer/
+models.dvc
+
+# Documentation and notebooks
+docs/
 notebooks/
+README.md
+README.html
+*.bib
+*.qmd
+
+# Project files
+*.Rproj
+config.yml
+LICENSE

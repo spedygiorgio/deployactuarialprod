@@ -50,7 +50,7 @@ The views and opinions expressed in this presentation are those of the author an
 
 - **Definition**: MLOps integrates practices to automate and manage the entire machine learning model lifecycle, improving deployment efficiency and reliability in production.
 
-- **Why It's Needed**: Bridges the gap between development and production, enabling better collaboration between data scientists and engineers for models that are more performant, scalable, and maintainable.
+- **Why It's Needed**: Bridges the gap between development and production, enabling better collaboration between data scientists and engineers for models that are more performing, scalable, and maintainable.
 
 - **Key Benefits**: Unified workflow reduces errors, accelerates deployment, and provides continuous monitoring to keep models up-to-date and accurate.
 
@@ -83,6 +83,9 @@ The views and opinions expressed in this presentation are those of the author an
 - Code assistant tools are becoming increasingly widespread in actuarial and data science workflows, significantly improving productivity and accelerating development cycles.
 - These tools can support developers in writing boilerplate code, generating documentation, debugging, and exploring alternative implementations.
 - However, AI-generated code should never be accepted blindly. Outputs must always be critically reviewed, validated, and tested before being used in production environments.
+
+------------------------------------------------------------------------
+
 - Particular attention should be paid to:
   - hidden logical errors,
   - inefficient implementations,
@@ -91,7 +94,6 @@ The views and opinions expressed in this presentation are those of the author an
   - and hallucinated libraries or functions.
 - In actuarial contexts, domain expertise remains essential: the final responsibility for the correctness, interpretability, and regulatory compliance of the model always lies with the practitioner.
 - AI tools should therefore be considered as productivity enhancers rather than substitutes for actuarial judgment and software engineering best practices.
-
 
 ------------------------------------------------------------------------
 
@@ -107,10 +109,17 @@ The views and opinions expressed in this presentation are those of the author an
   - and identify potential relationships between predictors and targets.
 - Exploratory analysis also helps identify:
   - incorrect formats or inconsistent encodings,
+
   - data leakage risks,
+
   - unstable variables,
+
   - highly imbalanced targets,
+
   - and unexpected correlations.
+
+------------------------------------------------------------------------
+
 - Visualization techniques such as histograms, boxplots, scatter plots, correlation matrices, and grouped summaries often provide insights that are difficult to detect through automated pipelines alone.
 - A good understanding of the data generation process is frequently more valuable than experimenting with increasingly complex models.
 
@@ -141,14 +150,39 @@ The views and opinions expressed in this presentation are those of the author an
 - Assumptions, limitations, preprocessing steps, feature engineering choices, and validation methodologies should be explicitly documented.
 - Effective communication between actuaries, data scientists, software engineers, and business stakeholders is critical to ensure that models are correctly understood and properly integrated into operational processes.
 
-
-
 ------------------------------------------------------------------------
-
 
 # Python pipelines
 
-## Structure
+## Python set up
+
+### Why Python
+
+- It is the de-facto standard for ML
+
+- Rich ML libraries ecosystem as well as production and deployment tools
+
+- Well known by Computer Scientist and Data Engineers
+
+------------------------------------------------------------------------
+
+![Python Logo](assets/Python.svg.png){width="40%"}
+
+------------------------------------------------------------------------
+
+### Python environment
+
+- It is always advisable to create and environment in the project working directory
+
+- The environment allows to set up the necessary libraries and tools to make the workflow reproducible and isolated
+
+- Tools like *uv* and *conda* make easier the creation of python environment
+
+------------------------------------------------------------------------
+
+## Python pipelines
+
+### Structure
 
 - Ingests the data, and clean
 - Fits the models, saves them
@@ -156,7 +190,7 @@ The views and opinions expressed in this presentation are those of the author an
 
 ------------------------------------------------------------------------
 
-## Running the pipeline
+### Running the pipeline
 
 - see the `main.py` file
 - the directory `steps` contains the steps of the pipeline
@@ -164,7 +198,7 @@ The views and opinions expressed in this presentation are those of the author an
 
 ------------------------------------------------------------------------
 
-## Requirements
+### Requirements
 
 - Python packages specified in a `requirements.txt` file
 - The `requirements.txt` file is used to create a virtual environment

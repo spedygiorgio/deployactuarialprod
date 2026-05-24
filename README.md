@@ -18,7 +18,7 @@
 - Activate the virtual environment: `source deployer/bin/activate`
 - Install the required packages: `pip install -r requirements.txt`
 
-### oppure con `uv`:
+### oppure con `uv`
 
 ```bash
 uv venv deployer
