@@ -147,7 +147,40 @@ The views and opinions expressed in this presentation are those of the author an
 
 # Python pipelines
 
-## Structure
+## Python set up
+
+### Why Python
+
+- It is the de-facto standard for ML
+
+- Rich ML libraries ecosystem as well as production and deployment tools
+
+- Well known by Computer Scientist and Data Engineers
+
+
+
+------------------------------------------------------------------------
+
+![Python Logo](assets/Python.svg.png){width="40%"}
+
+
+------------------------------------------------------------------------
+
+### Python environment
+
+- It is always advisable to create and environment in the project working directory
+
+- The environment allows to set up the necessary libraries and tools to make the 
+workflow reproducible and isolated
+
+-  Tools like *uv* and *conda* make easier the creation of python environment
+
+
+------------------------------------------------------------------------
+
+## Python pipelines
+
+### Structure
 
 - Ingests the data, and clean
 - Fits the models, saves them
@@ -155,7 +188,7 @@ The views and opinions expressed in this presentation are those of the author an
 
 ------------------------------------------------------------------------
 
-## Running the pipeline
+### Running the pipeline
 
 - see the `main.py` file
 - the directory `steps` contains the steps of the pipeline
@@ -163,7 +196,7 @@ The views and opinions expressed in this presentation are those of the author an
 
 ------------------------------------------------------------------------
 
-## Requirements
+### Requirements
 
 - Python packages specified in a `requirements.txt` file
 - The `requirements.txt` file is used to create a virtual environment

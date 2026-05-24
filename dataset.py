@@ -12,7 +12,7 @@ data_folder = 'data/'
 data_file = os.path.join(data_folder, 'french_mtpl.zip')
 @timer
 def main():
-    dtypes_list = {'ClaimNb':np.int32, 
+    dtypes_list = {'ClaimNb':np.int32, 'Area':str, 'Region':str, 'VehBrand':str, 'VehGas':str,
     'Exposure':np.float32, 'claims_cost ':np.float32, 'Density':np.int16, 
     'AvgClaimAmount':np.float32, 'BonusMalus':np.int16, 
     'VehPower':np.int16, 'VehAge':np.int16, 'DrivAge':np.int16}
