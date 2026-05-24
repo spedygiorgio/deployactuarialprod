@@ -19,10 +19,10 @@ def load_scorer(model_path, model_type):
 
 #%% define the input schema
 def create_input_form():# -> dict[str, Any]:
-    VehPower = st.number_input('Vehicle Power', min_value=1, max_value=20, value=1)
-    VehAge = st.number_input('Vehicle Age', min_value=0, max_value=120, value=0)
+    VehPower = st.number_input('Vehicle Power', min_value=1, max_value=20, value=6)
+    VehAge = st.number_input('Vehicle Age', min_value=0, max_value=120, value=10)
     DrivAge = st.number_input('Driver Age', min_value=18, max_value=120, value=18)
-    Density = st.number_input('Density', min_value=0, max_value=30000, value=0)
+    Density = st.number_input('Density', min_value=0, max_value=30000, value=400)
     BonusMalus = st.number_input('Bonus Malus', min_value=50, max_value=230, value=50)
     VehBrand = st.selectbox('Vehicle Brand', ['B12', 'B3', 'B2', 'B5', 'B4', 'B6', 'B10', 'B1', 'B13', 'B11', 'B14'])
     VehGas = st.selectbox('Vehicle Gas', ['Regular', 'Diesel'])

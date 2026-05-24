@@ -109,10 +109,17 @@ The views and opinions expressed in this presentation are those of the author an
   - and identify potential relationships between predictors and targets.
 - Exploratory analysis also helps identify:
   - incorrect formats or inconsistent encodings,
+
   - data leakage risks,
+
   - unstable variables,
+
   - highly imbalanced targets,
+
   - and unexpected correlations.
+
+------------------------------------------------------------------------
+
 - Visualization techniques such as histograms, boxplots, scatter plots, correlation matrices, and grouped summaries often provide insights that are difficult to detect through automated pipelines alone.
 - A good understanding of the data generation process is frequently more valuable than experimenting with increasingly complex models.
 
@@ -157,12 +164,9 @@ The views and opinions expressed in this presentation are those of the author an
 
 - Well known by Computer Scientist and Data Engineers
 
-
-
 ------------------------------------------------------------------------
 
 ![Python Logo](assets/Python.svg.png){width="40%"}
-
 
 ------------------------------------------------------------------------
 
@@ -170,11 +174,9 @@ The views and opinions expressed in this presentation are those of the author an
 
 - It is always advisable to create and environment in the project working directory
 
-- The environment allows to set up the necessary libraries and tools to make the 
-workflow reproducible and isolated
+- The environment allows to set up the necessary libraries and tools to make the workflow reproducible and isolated
 
--  Tools like *uv* and *conda* make easier the creation of python environment
-
+- Tools like *uv* and *conda* make easier the creation of python environment
 
 ------------------------------------------------------------------------
 
