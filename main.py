@@ -17,6 +17,10 @@ os.makedirs('models', exist_ok=True)
 freq_model_path = os.path.join('models', 'frequency_model.cbm')
 sev_model_path = os.path.join('models', 'severity_model.cbm')
 
+# number of trees to save (shrink model to first n+1 iterations)
+n = 15
+
+
 #%% main core
 @timer
 def main():
@@ -52,17 +56,18 @@ def main():
         
         # train the models
         ## frequency
-        trainer_frequency = Trainer(target='ClaimNb', train_data=freq_train, val_data=freq_valid, test_data=freq_test)
+        trainer_frequency = Trainer(target='ClaimNb', train_data=freq_train, val_data=freq_valid, test_data=freq_test, iterations=n+1)
         _, _, test_freq_pool = trainer_frequency.create_pools()
         frequency_model = trainer_frequency.train_model()
         freq_apratio, freq_mpd = trainer_frequency.evaluate_model(frequency_model, test_freq_pool)
         mlflow.log_metric('freq_apratio', freq_apratio)
         mlflow.log_metric('freq_mpd', freq_mpd)
         logger.info(f'Frequency model trained: A/P ratio={freq_apratio:.2f}, MPD={freq_mpd:.2f}')
+        # salva il modello (è già addestrato per n+1 iterazioni)
         frequency_model.save_model(freq_model_path)
         
         ## severity
-        trainer_severity = Trainer(target='severity', train_data=severity_train, val_data=severity_valid, test_data=severity_test, model_type='severity')
+        trainer_severity = Trainer(target='severity', train_data=severity_train, val_data=severity_valid, test_data=severity_test, model_type='severity', iterations=n+1)
         _, _, test_sev_pool = trainer_severity.create_pools()
         severity_model = trainer_severity.train_model()
         sev_apratio, sev_rmse = trainer_severity.evaluate_model(severity_model, test_sev_pool)
@@ -75,8 +80,9 @@ def main():
         ## tagging
         mlflow.set_tag('modelli', 'catboost freqsev')
         ## logging
-        mlflow.catboost.log_model(frequency_model, 'frequency_model')
-        mlflow.catboost.log_model(severity_model, 'severity_model')
+        # use `name` to avoid deprecated `artifact_path` warning
+        mlflow.catboost.log_model(frequency_model, name='frequency_model')
+        mlflow.catboost.log_model(severity_model, name='severity_model')
         ## registering
         ### frequency
         frequency_model_name = 'catboost frequency model'
