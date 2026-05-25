@@ -1,13 +1,21 @@
 # Deploying actuarial models in production
 
-## Files
+## Repository structure
 
-- `dataset.py`: Save the datasets in the data folder
-- `main.py`: Fits the models and saves it them the models folder
-- `app.py`: API to serve the models
-- `requirements.txt`: Python packages required to run the project
-- `Dockerfile`: Dockerfile to build the image
-- `quote-page.py`: Streamlit app to get a quote from the model
+- `app.py`: FastAPI application (endpoints, lifecycle, logging)
+- `schemas.py`: Pydantic request/response models for the API
+- `constants.py`: Centralized validation constants for categorical and numeric variables
+- `dataset.py`: generates and stores train/validation/test datasets in `data/`
+- `main.py`: runs training pipeline and persists CatBoost models in `models/`
+- `steps/`: training and prediction pipeline components
+- `utils.py`: shared utilities (logging and timer helpers)
+- `quote-page.py`: Streamlit demo app for quote simulation
+- `notebooks/try_api.ipynb`: notebook to test API endpoints
+- `requirements.txt`: Python dependencies
+- `Dockerfile`: container image definition for API deployment
+- `models/`: trained CatBoost models used at inference time
+- `data/`: input and split datasets
+- `docs/`: presentation materials
 
 ## Set up the python environment
 
@@ -15,7 +23,7 @@
 
 - Create a virtual environment, e.g. using venv: `python -m venv deployer`
 
-- Activate the virtual environment: `source deployer/bin/activate`
+- Activate the virtual environment (Windows): `deployer\Scripts\activate.bat`
 - Install the required packages: `pip install -r requirements.txt`
 
 ### oppure con `uv`
@@ -61,14 +69,14 @@ From another terminal, run the following command:
 python app.py
 ```
 
-then in the notebook folder you can execute the try_api.ipynb notebook to test the API.:
+Then execute `notebooks/try_api.ipynb` to test the endpoints (`/health`, `/ready`, `/predict/`).
 
 ### Running the Docker container
 
 To build the Docker image, run the following command:
 
 ```bash
-docker build -t deployer .
+docker build -t deployer:latest .
 ```
 
 To run the Docker container, use the following command:
@@ -82,3 +90,9 @@ To stop the Docker container, use the following command:
 ```bash
 docker stop deployer
 ```
+
+## API endpoints
+
+- `GET /health`: liveness check (process is running)
+- `GET /ready`: readiness check (models loaded and service ready)
+- `POST /predict/`: returns `Frequency`, `Severity`, and `Pure_Premium`

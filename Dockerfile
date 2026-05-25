@@ -5,6 +5,8 @@ WORKDIR /app
 
 # add app.py and models directory
 COPY app.py .
+COPY schemas.py .
+COPY constants.py .
 COPY utils.py .
 COPY models/ ./models/
 COPY steps/ ./steps/

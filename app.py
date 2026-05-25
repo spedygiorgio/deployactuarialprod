@@ -1,72 +1,164 @@
+"""FastAPI service for motor insurance pure premium prediction.
+
+App flow:
+1) Load CatBoost models at startup.
+2) Validate input payload through Pydantic schema.
+3) Build a one-row dataframe for model scoring.
+4) Predict frequency and severity, then combine into pure premium.
+"""
+
 #%% required libraries
-from fastapi import FastAPI, Depends
-from pydantic import BaseModel, Field
-from typing import Literal
+from contextlib import asynccontextmanager
+from time import perf_counter
+from uuid import uuid4
+import logging
+
+from fastapi import FastAPI, Depends, HTTPException, Request
+from fastapi.responses import JSONResponse
+from pydantic import BaseModel
 from catboost import CatBoostRegressor
 import pandas as pd
+from schemas import Insured, PredictionResponse
 from steps.predict import Predictor
 import uvicorn
 
-app = FastAPI()
-
-# Input schema for the insured person
-class Insured(BaseModel):
-    VehPower: int = Field(title='Vehicle Power', description='Vehicle power in CV', ge=1, le=20, default=5)
-    VehAge: int = Field(title='Vehicle Age', description='Vehicle age in years', ge=0, le=120, default=1)
-    DrivAge: int = Field(title='Driver Age', description='Driver age in years', ge=18, le=120, default=35)
-    Density: int = Field(title='Density', description='Density of inhabitants per km2', gt=0, le=30000, default=100)
-    BonusMalus: int = Field(title='Bonus Malus', description='Bonus Malus', ge=50, le=230, default=100)
-    VehBrand: Literal['B12', 'B3', 'B2', 'B5', 'B4', 'B6', 'B10', 'B1', 'B13', 'B11', 'B14'] = Field(title='Vehicle Brand', description='Vehicle brand as per allowed values')
-    VehGas: Literal['Regular', 'Diesel'] = Field(title='Vehicle Gas', description='Vehicle gas as per allowed values')
-    Region: Literal['R72', 'R91', 'R52', 'R11', 'R94', 'R93', 'R31', 'R82', 'R22', 'R21', 'R42', 'R54', 'R73', 'R41', 'R26', 'R25', 'R24', 'R53', 'R83', 'R23', 'R74', 'R43'] = Field(title='Region', description='Region code as per allowed values')
-    Area: Literal['A', 'B', 'C', 'D', 'E', 'F', 'G'] = Field(title='Area', description='Area code as per allowed values')
-
-# Output schema for prediction response
-class PredictionResponse(BaseModel):
-    Frequency: float
-    Severity: float
-    Pure_Premium: float
-
-# Load models as a startup event
-@app.on_event("startup")
-def load_models():
-    global model_freq, model_sev
-    model_freq = CatBoostRegressor()
-    model_freq.load_model('models/frequency_model.cbm')
-    model_sev = CatBoostRegressor()
-    model_sev.load_model('models/severity_model.cbm')
+logger = logging.getLogger("pricing_api")
+if not logger.handlers:
+    logging.basicConfig(
+        level=logging.INFO,
+        format="%(asctime)s %(levelname)s %(name)s %(message)s",
+    )
 
 
-# Dependency for loading the Predictor
-def get_predictor(model, type_):
-    return Predictor(model, type_)
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Initialize shared resources and keep app alive even if model loading fails."""
+    app.state.model_freq = None
+    app.state.model_sev = None
+    app.state.models_ready = False
+    app.state.model_load_error = None
+
+    try:
+        model_freq = CatBoostRegressor()
+        model_freq.load_model('models/frequency_model.cbm')
+        model_sev = CatBoostRegressor()
+        model_sev.load_model('models/severity_model.cbm')
+
+        app.state.model_freq = model_freq
+        app.state.model_sev = model_sev
+        app.state.models_ready = True
+        logger.info("event=models_loaded status=ok")
+    except Exception as exc:
+        app.state.model_load_error = str(exc)
+        logger.exception("event=models_loaded status=failed")
+
+    yield
+
+
+# Single FastAPI application instance exposed by uvicorn (`app:app`).
+app = FastAPI(lifespan=lifespan)
+
+# Factory helper used by FastAPI dependency injection.
+# It wraps a model with the right prediction mode.
+def get_frequency_predictor(request: Request) -> Predictor:
+    if not request.app.state.models_ready or request.app.state.model_freq is None:
+        raise HTTPException(status_code=503, detail="Frequency model not available")
+    return Predictor(request.app.state.model_freq, 'frequency')  # type: ignore[arg-type]
+
+
+def get_severity_predictor(request: Request) -> Predictor:
+    if not request.app.state.models_ready or request.app.state.model_sev is None:
+        raise HTTPException(status_code=503, detail="Severity model not available")
+    return Predictor(request.app.state.model_sev, 'severity')  # type: ignore[arg-type]
+
+
+def model_to_dict(model: BaseModel) -> dict:
+    """Support both Pydantic v2 (`model_dump`) and legacy v1 (`dict`)."""
+    if hasattr(model, "model_dump"):
+        return model.model_dump()
+    return model.dict()
 
 
 @app.get("/", response_model=dict)
 async def read_root():
-    return {"Health check": "OK"}
+    """Basic API info endpoint."""
+    return {
+        "service": "pricing-api",
+        "docs": "/docs",
+        "health": "/health",
+        "readiness": "/ready",
+    }
 
-# Prediction endpoint
+
+@app.get("/health", response_model=dict)
+async def health():
+    """Liveness endpoint: process is running."""
+    return {"status": "ok"}
+
+
+@app.get("/ready", response_model=dict)
+async def ready(request: Request):
+    """Readiness endpoint: models are loaded and API can serve predictions."""
+    if request.app.state.models_ready:
+        return {"status": "ready"}
+    return JSONResponse(
+        status_code=503,
+        content={
+            "status": "not_ready",
+            "reason": request.app.state.model_load_error or "models_not_loaded",
+        },
+    )
+
+# Main business endpoint: validate input, score both models, compose output.
 @app.post("/predict/", response_model=PredictionResponse)
 async def predict(
+    request: Request,
     insured: Insured,
-    predictor_freq: Predictor = Depends(lambda: get_predictor(model_freq, 'frequency')),
-    predictor_sev: Predictor = Depends(lambda: get_predictor(model_sev, 'severity'))
+    predictor_freq: Predictor = Depends(get_frequency_predictor),
+    predictor_sev: Predictor = Depends(get_severity_predictor)
 ):
-    # Convert insured data to DataFrame
-    df_insured = pd.DataFrame([insured.dict()])
+    request_id = request.headers.get("x-request-id", str(uuid4()))
+    start = perf_counter()
+
+    logger.info("event=predict_started request_id=%s", request_id)
+
+    # Convert validated payload into a single-row dataframe.
+    # CatBoost pipeline in `Predictor` expects tabular input.
+    df_insured = pd.DataFrame([model_to_dict(insured)])
+
+    # Required helper columns expected by training/prediction pipeline:
+    # - `log_exposure` for frequency model baseline
+    # - `ClaimNb` for severity model weighting path
     df_insured['log_exposure'] = 0.0
     df_insured['ClaimNb'] = 1
-    
-    # Perform predictions
-    pred_freq = predictor_freq.predict(df_insured)[0]
-    pred_sev = predictor_sev.predict(df_insured)[0]
-    pure_premium = pred_freq * pred_sev
-    
-    # Create response
-    return PredictionResponse(Frequency=pred_freq, Severity=pred_sev, Pure_Premium=pure_premium)
 
-#%% core to run the FastAPI app 
+    try:
+        # Score frequency and severity independently.
+        pred_freq = predictor_freq.predict(df_insured)[0]
+        pred_sev = predictor_sev.predict(df_insured)[0]
+
+        # Actuarial composition rule: pure premium = expected frequency * expected severity.
+        pure_premium = pred_freq * pred_sev
+
+        latency_ms = (perf_counter() - start) * 1000
+        logger.info(
+            "event=predict_completed request_id=%s latency_ms=%.2f outcome=success",
+            request_id,
+            latency_ms,
+        )
+
+        # Return structured response documented by `PredictionResponse`.
+        return PredictionResponse(Frequency=pred_freq, Severity=pred_sev, Pure_Premium=pure_premium)
+    except Exception:
+        latency_ms = (perf_counter() - start) * 1000
+        logger.exception(
+            "event=predict_completed request_id=%s latency_ms=%.2f outcome=error",
+            request_id,
+            latency_ms,
+        )
+        raise
+
+#%% local entrypoint for direct execution (python app.py)
 if __name__ == "__main__":
     uvicorn.run(
             "app:app",
