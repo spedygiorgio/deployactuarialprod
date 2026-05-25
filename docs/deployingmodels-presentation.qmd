@@ -29,7 +29,7 @@ format:
 date: today
 editor: visual
 bibliography: deploying.bib
-csl: 4or.csl
+csl: springer-basic-author-date.csl
 ---
 
 # Disclaimer
