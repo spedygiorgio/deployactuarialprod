@@ -18,7 +18,7 @@ freq_model_path = os.path.join('models', 'frequency_model.cbm')
 sev_model_path = os.path.join('models', 'severity_model.cbm')
 
 # number of trees to save (shrink model to first n+1 iterations)
-n = 15
+n = 2000
 
 
 #%% main core

@@ -45,6 +45,6 @@ def main():
     test_df.to_csv(os.path.join(data_folder, 'test.csv'), index=False, sep=";")
     logger.info('Dataset salvato in data/train.csv, data/valid.csv e data/test.csv')
     return None
-# %%
+# %% 
 if __name__ == '__main__':
     main()
